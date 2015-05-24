@@ -11,7 +11,7 @@
 void kernel_early(void)
 {
 	terminal_initialize();
-	printf("Welcome to casteOS!\n\nInitializing GDT and IDT...");
+	printf("Welcome to casteOS!\n\nInitializing GDT and IDT..."); // eyy shitty \t's to do formatting. implement actual logging with pretty colores later.. 
 	init_descriptor_tables();
 	printf("\t\t[OK]\nInstalling IRQ...");
 	irq_install();
