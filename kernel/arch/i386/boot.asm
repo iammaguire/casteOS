@@ -3,6 +3,10 @@ MEMINFO     equ  1<<1                   ; provide memory map
 FLAGS       equ  MBALIGN | MEMINFO      ; this is the Multiboot 'flag' field
 MAGIC       equ  0x1BADB002             ; 'magic number' lets bootloader find the header
 CHECKSUM    equ -(MAGIC + FLAGS)        ; checksum of above, to prove we are multiboot
+
+WIDTH equ 800
+HEIGHT equ 600
+DEPTH equ 32
  
 section .multiboot
 align 4

@@ -1,4 +1,5 @@
 #define MAX_COMMANDS 100
+#define MAX_COMMANDS_HISTORY 100
 
 typedef struct
 {

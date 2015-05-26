@@ -1,4 +1,5 @@
 #define KB_BUF_SIZE 20
+#define MAX_HOOKS 100
 
 enum kbOpts
 {
@@ -9,6 +10,13 @@ enum kbOpts
   RALT = 0x10,
   RSHIFT = 0x20
 };
+
+struct kb_hook_struct
+{
+  void* func;
+  int key;
+} __attribute((packed));
+typedef struct kb_hook_struct kb_hook_t;
 
 unsigned char kbdus[128] =
 {
@@ -32,15 +40,15 @@ unsigned char kbdus[128] =
     0,	/* 69 - Num lock*/
     0,	/* Scroll Lock */
     0,	/* Home key */
-    0,	/* Up Arrow */
+    0xA1,	/* Up Arrow */
     0,	/* Page Up */
   '-',
-    0,	/* Left Arrow */
+    0xA2,	/* Left Arrow */
     0,
-    0,	/* Right Arrow */
+    0xA3,	/* Right Arrow */
   '+',
     0,	/* 79 - End key*/
-    0,	/* Down Arrow */
+    0xA4,	/* Down Arrow */
     0,	/* Page Down */
     0,	/* Insert Key */
     0,	/* Delete Key */

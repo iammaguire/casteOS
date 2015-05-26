@@ -5,7 +5,36 @@
 
 uint16_t kb_flags = 0;
 unsigned int kb_buf[KB_BUF_SIZE];
+kb_hook_t kb_hooks[MAX_HOOKS];
+int num_of_hooks = 0;
 int last = 0;
+
+void scan_key_hooks(int key)
+{
+	for(int i = 0; i < num_of_hooks; i++)
+	{
+		if(key == kb_hooks[i].key)
+		{
+			void (*hook_func)(void);
+			hook_func = kb_hooks[i].func;
+			(*hook_func)();
+		}
+	}
+}
+
+void add_key_hook(int key, void* func)
+{
+	if(num_of_hooks < MAX_HOOKS)
+	{
+		kb_hooks[num_of_hooks].key = key;
+		kb_hooks[num_of_hooks].func = func;
+		num_of_hooks++;
+	}
+	else
+	{
+		puts("Too many keyboard hooks assigned...");
+	}
+}
 
 void read_kb_buf(uint8_t *buf, uint16_t size)
 {
@@ -51,6 +80,18 @@ void keyboard_handler(registers_t *regs)
 			case 0xAA:
 				kb_flags |= LALT;
 				return;
+			case 0xA1:
+				scan_key_hooks(0xA1);
+				return;
+			case 0xA2:
+				scan_key_hooks(0xA2);
+				return;
+			case 0xA3:
+				scan_key_hooks(0xA3);
+				return;
+			case 0xA4:
+				scan_key_hooks(0xA4);
+				return;
 		}
 
 		if(!(kb_flags & CTRL))
@@ -59,6 +100,8 @@ void keyboard_handler(registers_t *regs)
 				kb_buf[last++] = kbdusShift[scancode];
 			else
 				kb_buf[last++] = kbdus[scancode];
+
+			scan_key_hooks(kb_buf[last - 1]);
 			
 			read_kb_buf(kb_buf, last);
 		}
@@ -68,7 +111,7 @@ void keyboard_handler(registers_t *regs)
 	}
 }
 
-void install_keyboard()
+void keyboard_install()
 {
 	in_size = 0;
 
