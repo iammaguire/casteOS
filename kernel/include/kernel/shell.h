@@ -11,4 +11,5 @@ typedef struct
 extern void add_new_command();
 extern void help_command();
 extern void hello_command();
+extern void reboot_command();
 extern void empty_command();

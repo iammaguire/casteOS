@@ -57,6 +57,7 @@ void init_shell()
 
 	add_new_command("help", "Displays this message.", help_command);
 	add_new_command("hello", "Ayyy.", hello_command);
+	add_new_command("reboot", "Reboots the computer.", reboot_command);
 	add_new_command("", "", empty_command);
 }
 
@@ -97,4 +98,9 @@ void help_command()
 void hello_command()
 {
 	printf("Hi!! :)\n");
+}
+
+void reboot_command()
+{
+	reboot();
 }
