@@ -20,7 +20,7 @@ void kernel_early(void)
   	printf(" \\___\\__,_|___/\\__\\___|\\____/|_____/ \n\n");
 	terminal_setcolor(make_color(COLOR_LIGHT_GREY, COLOR_BLACK));
 
-	printf("Welcome to casteOS!\n\nInitializing GDT and IDT..."); // eyy shitty \t's to do formatting. implement actual logging with pretty colores later.. 
+	printf("Welcome to casteOS!\n\nInitializing GDT and IDT..."); // eyy shitty \t's to do formatting. implement actual logging with pretty colors later.. 
 	init_descriptor_tables();
 	printf("\t\t[OK]\nInstalling IRQ...");
 	irq_install();
@@ -28,6 +28,7 @@ void kernel_early(void)
 	printf("\t\t\t  [OK]\nInstalling keyboard driver...");
 	keyboard_install();
 	timer_install();
+	floppy_install();
 	printf("\t   [OK]\nInitializing stdio...");
 	init_stdio();
 	init_shell();
