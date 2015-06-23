@@ -20,20 +20,23 @@ void kernel_early(void)
   	printf(" \\___\\__,_|___/\\__\\___|\\____/|_____/ \n\n");
 	terminal_setcolor(make_color(COLOR_LIGHT_GREY, COLOR_BLACK));
 
-	printf("Welcome to casteOS!\n\nInitializing GDT and IDT..."); // eyy shitty \t's to do formatting. implement actual logging with pretty colors later.. 
+	printf("Welcome to casteOS!\n\nInitializing GDT and IDT...\n"); 
 	init_descriptor_tables();
-	printf("\t\t[OK]\nInstalling IRQ...");
+	printf("Installing IRQ...\n");
 	irq_install();
-	printf("\t\t\t\t[OK]\nInstalling paging...");
-	printf("\t\t\t  [OK]\nInstalling keyboard driver...");
+	// printf("Installing paging...\n");
+	// paging_install();
+	printf("Installing keyboard driver...\n");
 	keyboard_install();
+	printf("Installing timer driver...\n");
 	timer_install();
-	floppy_install();
-	printf("\t   [OK]\nInitializing stdio...");
-	init_stdio();
-	init_shell();
-	printf("\t\t    [OK]\nFinished initialization successfully.\n\n");
 	__asm__ __volatile__ ("sti");
+	printf("Installing floppy driver...\n");
+	floppy_install();
+	printf("Initializing stdio...\n");
+	init_stdio();
+	printf("\nFinished initialization successfully, starting CLI...\n\n");
+	init_shell();
 }
 
 void kernel_main(void)

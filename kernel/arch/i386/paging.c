@@ -11,7 +11,7 @@ void paging_install()
 	for(i = 0; i < 1024; i++)
 	{
 		page_table[i] = addr | 3; // 011 (supervisor lvl, r/w perms, present)
-		address += 4096;
+		addr += 4096;
 	}
 
 	page_directory[0] = page_table;

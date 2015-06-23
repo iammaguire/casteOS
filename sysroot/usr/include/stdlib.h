@@ -11,6 +11,7 @@ __attribute__((__noreturn__))
 void abort(void);
 char* itoa(int, char*, int);
 char* itoa_nbuf(int, int);
+int atoi(char*);
 
 #ifdef __cplusplus
 }

@@ -36,6 +36,7 @@ stdio/stdio.o \
 stdio/portb.o \
 stdlib/abort.o \
 stdlib/itoa.o \
+stdlib/atoi.o \
 string/memcmp.o \
 string/memcpy.o \
 string/memmove.o \

@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "kernel/shell.h"
+//#include "kernel/floppy_driver.h"
 
 command_table_t commands[MAX_COMMANDS];
 command_table_t history[MAX_COMMANDS_HISTORY];
@@ -58,6 +59,7 @@ void init_shell()
 	add_new_command("help", "Displays this message.", help_command);
 	add_new_command("hello", "Ayyy.", hello_command);
 	add_new_command("reboot", "Reboots the computer.", reboot_command);
+	add_new_command("read", "Reads a sector.", read_command);
 	add_new_command("", "", empty_command);
 }
 
@@ -103,4 +105,37 @@ void hello_command()
 void reboot_command()
 {
 	reboot();
+}
+
+void read_command()
+{
+	uint32_t sectornum = 0;
+	char sectornumbuf[4];
+	uint8_t* sector = 0;
+
+	printf("\nSector number (0 is default): ");
+	getstr(sectornumbuf);
+	sectornum = atoi(sectornumbuf);
+
+	printf("\nSector %s contents: \n\n", itoa(sectornum, 0, 10));
+
+	sector = flpydsk_read_sector(sectornum);
+
+	if(sector != 0)
+	{
+		int i = 0;
+		for(int c = 0; c < 4; c++)
+		{
+			for(int j = 0; j < 128; j++)
+				printf("%s ", itoa(i + j, 0, 10));
+				//printf("0x%s ", itoa(sector[i + j], 0, 16));
+			i += 128;
+		
+			printf("\nPress any key to continue...\n");
+			getch();		
+		}
+	}
+	else
+		printf("\nError reading sector from disk!");
+	printf("\nDone\n");
 }
