@@ -257,7 +257,7 @@ void flpydsk_detect_drives()
 	outportb(0x70, 0x10);
 	unsigned drives = inportb(0x71);
 	
-	printf("Detecting drives: \n");
+	printf("Detecting floppy drives: \n");
 	printf("\t- Floppy drive 0: %s\n", drive_types[drives >> 4]);
 	printf("\t- Floppy drive 1: %s\n", drive_types[drives & 0xf]);
 }

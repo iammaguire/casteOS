@@ -34,6 +34,7 @@ stdio/puts.o \
 stdio/get.o \
 stdio/stdio.o \
 stdio/portb.o \
+stdio/portw.o \
 stdlib/abort.o \
 stdlib/itoa.o \
 stdlib/atoi.o \

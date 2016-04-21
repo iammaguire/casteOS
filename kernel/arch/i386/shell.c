@@ -3,6 +3,7 @@
 #include <string.h>
 #include "kernel/shell.h"
 //#include "kernel/floppy_driver.h"
+#include "kernel/hard_disk_driver.h"
 
 command_table_t commands[MAX_COMMANDS];
 command_table_t history[MAX_COMMANDS_HISTORY];
@@ -59,7 +60,10 @@ void init_shell()
 	add_new_command("help", "Displays this message.", help_command);
 	add_new_command("hello", "Ayyy.", hello_command);
 	add_new_command("reboot", "Reboots the computer.", reboot_command);
-	add_new_command("read", "Reads a sector.", read_command);
+	add_new_command("read", "Reads some stuff.", read_command);
+	add_new_command("write", "Writes some stuff.", write_command);
+	add_new_command("mbr", "Reads mbr and displays data of primary master ata drive.", mbr_command);
+	add_new_command("clear", "Clears the screen.", clear_command);
 	add_new_command("", "", empty_command);
 }
 
@@ -107,35 +111,81 @@ void reboot_command()
 	reboot();
 }
 
+void write_command()
+{	
+	unsigned short buf[256 * 2];
+	for(int i = 0; i < 256 * 2; i++)
+	{
+		buf[i] = 0;
+	}
+	buf[0] = 0xDEAD;
+	buf[1] = 0xBEEF;
+	buf[300] = 0x1EE7;
+	buf[301] = 0xBAB3;
+
+	if(!ata_write_lba28(buf, 0, 2, ATA_PRIMARY_MASTER))
+	{
+		printf("Write failed.\n");
+		return;
+	}
+}
+
+void mbr_command()
+{
+	uint16_t buf[256];
+
+	if(!ata_read_lba28(buf, 0, 1, ATA_PRIMARY_MASTER))
+	{
+		printf("Read failed.\n");
+		return;
+	}
+
+	int part1_base = 0x1BE / 2; // divide account for 16 bit entries in array
+	
+	printf("Starting sector (LBA): %s\n", itoa((uint32_t) (buf[part1_base + 8 / 2] | buf[part1_base + 5] >> 16), 0, 10));
+	printf("Total sectors: %s\n", itoa((uint32_t) (buf[part1_base + 12 / 2] | buf[part1_base + 7] >> 16), 0, 10));
+}
+
 void read_command()
 {
-	uint32_t sectornum = 0;
-	char sectornumbuf[4];
-	uint8_t* sector = 0;
+	char addrbuf[10];
+	char secbuf[4];
+	uint32_t addr = 0;
+	uint32_t sec_ct = 0;
 
-	printf("\nSector number (0 is default): ");
-	getstr(sectornumbuf);
-	sectornum = atoi(sectornumbuf);
+	printf("Start addr: ");
+	getstr(addrbuf);
+	printf("Sector count: ");
+	getstr(secbuf);
 
-	printf("\nSector %s contents: \n\n", itoa(sectornum, 0, 10));
+	addr = atoi(addrbuf);
+	sec_ct = atoi(secbuf);
+	
+	unsigned short buf[256 * sec_ct];
 
-	sector = flpydsk_read_sector(sectornum);
-
-	if(sector != 0)
+	if(!ata_read_lba28(buf, addr, sec_ct, ATA_PRIMARY_MASTER))
 	{
-		int i = 0;
-		for(int c = 0; c < 4; c++)
+		printf("Read failed.\n");
+		return;
+	}
+
+	for (int i = 0; i < 256 * sec_ct; i++)
+	{
+    	//printf("%c", (uint8_t) buf[i]);//itoa((uint16_t) (buf[i]), 0, 16));
+		if(buf[i] == 0)
+			printf(".");
+		else
 		{
-			for(int j = 0; j < 128; j++)
-				printf("%s ", itoa(i + j, 0, 10));
-				//printf("0x%s ", itoa(sector[i + j], 0, 16));
-			i += 128;
-		
-			printf("\nPress any key to continue...\n");
-			getch();		
+			//printf("%s ", itoa((uint16_t) (buf[i]), 0, 16));
+			printf("%c", (uint8_t) buf[i]);printf("%c", (uint8_t) (buf[i] >> 8));
 		}
 	}
-	else
-		printf("\nError reading sector from disk!");
-	printf("\nDone\n");
+
+    printf("\n");
+}
+
+void clear_command()
+{
+	terminal_clear();
+	//printf("\n");
 }

@@ -17,6 +17,7 @@ int printf(const char* __restrict, ...);
 int putchar(int);
 int puts(const char*);
 unsigned char inportb(unsigned short);
+unsigned char inportw(unsigned short);
 void outportb(unsigned short, unsigned char);
 int getchar(); // get a char and print it
 int getch(); // get a char and don't print it

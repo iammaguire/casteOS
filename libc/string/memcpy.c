@@ -8,3 +8,10 @@ void* memcpy(void* restrict dstptr, const void* restrict srcptr, size_t size)
 		dst[i] = src[i];
 	return dstptr;
 }
+
+char *strcpy(char *s1, const char *s2)
+{
+    char *s = s1;
+    while ((*s++ = *s2++) != 0);
+    return (s1);
+}

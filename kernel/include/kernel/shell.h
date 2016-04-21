@@ -13,4 +13,7 @@ extern void help_command();
 extern void hello_command();
 extern void reboot_command();
 extern void read_command();
+extern void write_command();
+extern void mbr_command();
+extern void clear_command();
 extern void empty_command();

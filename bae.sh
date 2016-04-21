@@ -1,2 +1,1 @@
-./iso.sh
 ./qemu.sh
