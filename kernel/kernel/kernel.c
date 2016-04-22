@@ -82,7 +82,7 @@ void kernel_early(struct multiboot* mbd, unsigned int magic)
 
 void kernel_main(void)
 {
-	if(!multiboot_info->flags & (1 << 11)) 
+	/*if(!multiboot_info->flags & (1 << 11)) 
 	{
 		terminal_setcolor(make_color(COLOR_GREEN, COLOR_BLACK));
 		printf("Hello kernel world!\n\n");
@@ -91,5 +91,9 @@ void kernel_main(void)
 		for(;;)
 			shell();
 		for(;;);
-	}
+	}*/
+
+	for(;;)
+		update_graphics();
+	for(;;);
 }
