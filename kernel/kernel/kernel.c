@@ -3,6 +3,7 @@
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdbool.h>
 
 #include <kernel/tty.h>
 #include <kernel/vga.h>
@@ -34,15 +35,11 @@ void kernel_early(struct multiboot* mbd, unsigned int magic)
 	irq_install();
 	// printf("Installing paging...\n");
 	// paging_install();
-
-	uint32_t* memtest = &kernstart;
-	for(int i = 0; i < (&kernend - &kernstart); i++)
-	{
-		//memtest[i] = 0x80;
-	}
 	
 	printf("\nReading multiboot info...\n");
 	
+	//break_everything_completely(false);
+
 	if(!(mbd->flags & 1))
 	{
 		printf("\tBit 0 of flags isn't set, invalid data... Aborting boot!\n");
@@ -100,4 +97,18 @@ void kernel_main(void)
 	for(;;)
 		shell();
 	for(;;);
+}
+
+void break_everything_completely(bool burn_it_all)
+{
+	printf("Poof! Your code is no more.");
+
+	uint32_t* kernel_code = &kernstart;
+ 	
+ 	for(int i = 0; i < (&kernend - &kernstart); i++)
+ 	{
+ 		kernel_code[i] = burn_it_all ? 0xDEADBEEF : 0x31C0;
+ 	}
+
+ 	printf("I could literally say anything and do anything because I will never ever be executed.");
 }
