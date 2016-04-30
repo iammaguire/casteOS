@@ -10,7 +10,30 @@ void pmm_install(struct multiboot* mbd, uint32_t mem_size, uint32_t* mem_map)
 	printf("\tFlags: 0b%s\n", itoa_nbuf(mbd->flags, 2));
 	printf("\tMemory map length: 0x%s\n", itoa_nbuf(mbd->mmap_length, 16));
 	printf("\tMemory map address: 0x%s\n", itoa_nbuf(mbd->mmap_addr, 16));
+
+	struct multiboot_memory_map* region = (struct multiboot_memory_map*) mbd->mmap_addr;
+	uint32_t i = 0;
 	
+	while(region < mbd->mmap_addr + mbd->mmap_length) {
+		if (i > 0 && region->base_addr_low == 0)
+			break;
+
+		if (region->type > 4)
+			region->type = 1;
+
+		printf("region: %s ", itoa_nbuf(i, 10));
+		printf("start: 0x%s", itoa_nbuf(region->base_addr_high, 16));
+		printf("%s", itoa_nbuf(region->base_addr_low, 16));
+		printf(" length (bytes): 0x%s", itoa_nbuf(region->length_high, 10));
+		printf("%s", itoa_nbuf(region->length_low, 16));
+		printf(" type: %s (", itoa_nbuf(region->type, 10));
+		printf("%s)\n", strMemoryTypes[region->type - 1]);
+	
+		i++;
+
+		region = (unsigned int)region + region->size + sizeof(unsigned int);
+	}
+
 	pmm_mem_size = mem_size;
 	pmm_mem_map = (uint32_t*) mem_map;
 	pmm_max_blocks = (pmm_get_mem_size() * 1024) / PMM_BLOCK_SIZE;

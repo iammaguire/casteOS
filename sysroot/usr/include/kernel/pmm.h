@@ -4,6 +4,13 @@
 #define PMM_BLOCK_SIZE 4096
 #define PMM_BLOCK_ALIGN PMM_BLOCK_SIZE
 
+char* strMemoryTypes[] = {
+	{"Available"},			//memory_region.type==0
+	{"Reserved"},			//memory_region.type==1
+	{"ACPI Reclaim"},		//memory_region.type==2
+	{"ACPI NVS Memory"}		//memory_region.type==3
+};
+
 uint32_t pmm_mem_size = 0;
 uint32_t pmm_used_blocks = 0;
 uint32_t pmm_max_blocks = 0;
