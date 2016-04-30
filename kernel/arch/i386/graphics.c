@@ -1,6 +1,8 @@
 #include <kernel/multiboot.h>
 #include <kernel/graphics.h>
 
+#include <stddef.h>
+
 void graphics_install(struct multiboot* mbd)
 {
 	info  = (struct vbe_mode_info_block *) mbd->vbe_mode_info;
@@ -15,23 +17,10 @@ void graphics_install(struct multiboot* mbd)
 	fill_rect(screen_width - 10, 0, 10, screen_height, 0xFFFFFF);
 
 	draw_string("casteOS - by Connor Perkins", 11, 1, 0x000000, 0xFFFFFF);
-
-	draw_line(10, 10, screen_height - 10, screen_width - 10, 0x00FF00);
 }
-
-int x = 0;
-int delta = 0;
 
 void update_graphics()
 {
-	//delta++;
-
-	if(delta == 30000)
-	{
-		delta = 0;
-		x++;
-		fill_rect(x, x, 10, 10, 0xFF0000);
-	}
 }
 
 void put_pixel(uint16_t x, uint16_t y, uint32_t color)

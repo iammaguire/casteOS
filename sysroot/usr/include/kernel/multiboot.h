@@ -21,10 +21,17 @@ struct vbe_mode_info_block
   uint8_t rsv_mask, rsv_position;
   uint8_t directcolor_attributes;
  
-  uint32_t physbase;  // your LFB (Linear Framebuffer) address ;)
+  uint32_t physbase;
   uint32_t reserved1;
   uint16_t reserved2;
 } __attribute__((packed));
+
+struct multiboot_memory_map {
+  unsigned int size;
+  unsigned int base_addr_low, base_addr_high;
+  unsigned int length_low, length_high;
+  unsigned int type;
+}  __attribute__((packed));
 
 struct multiboot
 {

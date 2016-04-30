@@ -4,19 +4,18 @@
 
 void pmm_install(struct multiboot* mbd, uint32_t mem_size, uint32_t* mem_map)
 {
-	char* buf = "";
-	printf("\tPMM initialized with %s KB of memory\n", itoa(mem_size / 1024, buf, 10));
-	printf("\tLower memory: 0x%s\n", itoa(mbd->mem_lower, buf, 16));
-	printf("\tUpper memory: 0x%s\n", itoa(mbd->mem_upper, buf, 16));
-	printf("\tFlags: 0b%s\n", itoa(mbd->flags, buf, 2));
-	printf("\tMemory map length: 0x%s\n", itoa(mbd->mmap_length, buf, 16));
-	printf("\tMemory map address: 0x%s\n", itoa(mbd->mmap_addr, buf, 16));
-
+	printf("\tPMM initialized with %s MB of usable memory\n", itoa_nbuf(mem_size / 1024, 10));
+	printf("\tLower memory: %s KB\n", itoa_nbuf(mbd->mem_lower, 10));
+	printf("\tUpper memory: %s MB\n", itoa_nbuf(mbd->mem_upper / 1024, 10));
+	printf("\tFlags: 0b%s\n", itoa_nbuf(mbd->flags, 2));
+	printf("\tMemory map length: 0x%s\n", itoa_nbuf(mbd->mmap_length, 16));
+	printf("\tMemory map address: 0x%s\n", itoa_nbuf(mbd->mmap_addr, 16));
+	
 	pmm_mem_size = mem_size;
 	pmm_mem_map = (uint32_t*) mem_map;
 	pmm_max_blocks = (pmm_get_mem_size() * 1024) / PMM_BLOCK_SIZE;
 	pmm_used_blocks = pmm_max_blocks;
-	//printf("\tlol: %s\n", itoa(pmm_get_block_count() / PMM_BLOCKS_PER_BYTE, 0, 10));
+
 	memset(pmm_mem_map, 0xf, pmm_get_block_count() / PMM_BLOCKS_PER_BYTE);
 }
 

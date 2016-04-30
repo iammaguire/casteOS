@@ -5,7 +5,7 @@ FLAGS       equ  MBALIGN | MEMINFO | GFXMODE      ; this is the Multiboot 'flag'
 MAGIC       equ  0x1BADB002             ; 'magic number' lets bootloader find the header
 CHECKSUM    equ -(MAGIC + FLAGS)        ; checksum of above, to prove we are multiboot
 
-MODE_TYPE equ 0
+MODE_TYPE equ 1
 WIDTH equ 1024
 HEIGHT equ 768
 DEPTH equ 32

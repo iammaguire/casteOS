@@ -2,7 +2,7 @@
 set -e
 . ./iso.sh
 
-qemu-system-$(./target-triplet-to-arch.sh $HOST) -cdrom myos.iso -boot d -hda c.img -m 1G
+qemu-system-$(./target-triplet-to-arch.sh $HOST) -cdrom myos.iso -boot d -hda c.img -m 130M
 
 if mount | grep /dev/loop0 > /dev/null; then
 	echo "Unmounting and deleting loop device..."

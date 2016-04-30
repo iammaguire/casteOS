@@ -10,6 +10,17 @@
 
 struct multiboot* multiboot_info;
 
+extern uint32_t kernstart;
+extern uint32_t kernend;
+
+//! different memory regions (in memory_region.type)
+char* strMemoryTypes[] = {
+	{"Available"},			//memory_region.type==0
+	{"Reserved"},			//memory_region.type==1
+	{"ACPI Reclaim"},		//memory_region.type==2
+	{"ACPI NVS Memory"}		//memory_region.type==3
+};
+
 void kernel_early(struct multiboot* mbd, unsigned int magic)
 {
 	multiboot_info = mbd;
@@ -31,69 +42,88 @@ void kernel_early(struct multiboot* mbd, unsigned int magic)
 	irq_install();
 	// printf("Installing paging...\n");
 	// paging_install();
-
-	uint32_t kernel_size = 0;
 	
 	printf("\nReading multiboot info...\n");
+	
 	if(!(mbd->flags & 1))
 	{
-		printf("\tBit 0 of flags isn't set, invalid data... Aborting boot!");
+		printf("\tBit 0 of flags isn't set, invalid data... Aborting boot!\n");
 		abort();
-	} 
-	else
-	{
-		uint32_t mem_size = ((mbd->mem_lower + mbd->mem_upper) * 1024); //Bytes
-		printf("Installing pmm...");
-		printf("\tWe have %s MB of memory\n", itoa(mem_size / (1024 * 1024), 0, 10));
-		//pmm_install(mbd, mem_size, 0x100000 + kernel_size * 512);
 	}
+
+
+	printf("Kernel start: 0x%s\n", itoa_nbuf(&kernstart, 16));
+	printf("Kernel end: 0x%s\n", itoa_nbuf(&kernend, 16));
+	printf("Kernel size: %s\n", itoa_nbuf((&kernend - &kernstart) / 1024, 10));
+
+	struct multiboot_memory_map* region = (struct multiboot_memory_map*) mbd->mmap_addr;
+	uint32_t i = 0;
+	
+	while(region < mbd->mmap_addr + mbd->mmap_length) {
+		region = (unsigned int)region + region->size + sizeof(unsigned int);
+
+		if (i > 0 && region->base_addr_low == 0)
+			break;
+
+		if (region->type > 4)
+			region->type = 1;
+
+		printf("region: %s ", itoa_nbuf(i, 10));
+		printf("start: 0x%s", itoa_nbuf(region->base_addr_high, 16));
+		printf("%s", itoa_nbuf(region->base_addr_low, 16));
+		printf(" length (bytes): 0x%s", itoa_nbuf(region->length_high, 10));
+		printf("%s", itoa_nbuf(region->length_low, 16));
+		printf(" type: %s (", itoa_nbuf(region->type, 10));
+		printf("%s)\n", strMemoryTypes[region->type - 1]);
+	
+		i++;
+	}
+
+	uint32_t kernel_size = &kernend - &kernstart;
+	uint32_t mem_size = mbd->mem_upper; // in KB
+	printf("Installing pmm...\n");
+	pmm_install(mbd, mem_size);
+	
+	abort();
 
 	printf("Installing keyboard driver...\n");
 	keyboard_install();
 	printf("Installing timer driver...\n");
 	timer_install();
+
 	__asm__ __volatile__ ("sti");
-	//printf("Installing floppy driver...\n");
+
 	printf("Initializing stdio...\n");
 	init_stdio();
 
-	if(mbd->flags & (1 << 11)) 
+	/*if(mbd->flags & (1 << 11)) 
 	{
 		graphics_install(mbd);
 		put_pixel(10, 100, 0x406001);
 		put_pixel(10, 110, 0xFFFF00);
 	} 
 	else 
-	{
-		printf("\n");
-		floppy_install();
+	{*/
+		//printf("\n");
+		//floppy_install();
 		printf("\nInstalling ATA driver...\n");
 		ata_install();
 		printf("\nInstalling FAT16 driver...\n");
 		f16_install();
 
-		printf("Doing other stuff...\n");
-
 		printf("\nFinished initialization successfully, starting CLI...\n\n");
 
 		init_shell();
-	}
+	//}
 }
 
 void kernel_main(void)
 {
-	/*if(!multiboot_info->flags & (1 << 11)) 
-	{
-		terminal_setcolor(make_color(COLOR_GREEN, COLOR_BLACK));
-		printf("Hello kernel world!\n\n");
-		terminal_setcolor(make_color(COLOR_LIGHT_GREY, COLOR_BLACK));
-
-		for(;;)
-			shell();
-		for(;;);
-	}*/
+	terminal_setcolor(make_color(COLOR_GREEN, COLOR_BLACK));
+	printf("Hello kernel world!\n\n");
+	terminal_setcolor(make_color(COLOR_LIGHT_GREY, COLOR_BLACK));
 
 	for(;;)
-		update_graphics();
+		shell();
 	for(;;);
 }
