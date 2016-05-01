@@ -2,14 +2,21 @@
 #include "kernel/pmm.h"
 #include <string.h>
 
-void pmm_install(struct multiboot* mbd, uint32_t mem_size, uint32_t* mem_map)
+void pmm_install(struct multiboot* mbd, uint32_t kernel_size, uint32_t kernel_start, uint32_t mem_size, uint32_t* mem_map)
 {
-	printf("\tPMM initialized with %s MB of usable memory\n", itoa_nbuf(mem_size / 1024, 10));
+	printf("\tPMM initialized with %s MB of memory\n", itoa_nbuf(mem_size / 1024, 10));
 	printf("\tLower memory: %s KB\n", itoa_nbuf(mbd->mem_lower, 10));
 	printf("\tUpper memory: %s MB\n", itoa_nbuf(mbd->mem_upper / 1024, 10));
 	printf("\tFlags: 0b%s\n", itoa_nbuf(mbd->flags, 2));
 	printf("\tMemory map length: 0x%s\n", itoa_nbuf(mbd->mmap_length, 16));
 	printf("\tMemory map address: 0x%s\n", itoa_nbuf(mbd->mmap_addr, 16));
+
+	pmm_mem_size = mem_size;
+	pmm_mem_map = mem_map;
+	pmm_max_blocks = (pmm_get_mem_size() * 1024) / PMM_BLOCK_SIZE;
+	pmm_used_blocks = pmm_max_blocks;
+
+	memset(pmm_mem_map, 0xf, pmm_get_block_count() / PMM_BLOCKS_PER_BYTE);
 
 	struct multiboot_memory_map* region = (struct multiboot_memory_map*) mbd->mmap_addr;
 	uint32_t i = 0;
@@ -31,15 +38,15 @@ void pmm_install(struct multiboot* mbd, uint32_t mem_size, uint32_t* mem_map)
 	
 		i++;
 
+		if(region->type == 1)
+		{
+			pmm_init_region(region->base_addr_low, region->length_low);
+		}
+
 		region = (unsigned int)region + region->size + sizeof(unsigned int);
 	}
 
-	pmm_mem_size = mem_size;
-	pmm_mem_map = (uint32_t*) mem_map;
-	pmm_max_blocks = (pmm_get_mem_size() * 1024) / PMM_BLOCK_SIZE;
-	pmm_used_blocks = pmm_max_blocks;
-
-	memset(pmm_mem_map, 0xf, pmm_get_block_count() / PMM_BLOCKS_PER_BYTE);
+	pmm_deinit_region(kernel_start, kernel_size);
 }
 
 int mmap_first_free()
@@ -112,8 +119,40 @@ void pmm_free_block(void* p)
 	int frame = addr / PMM_BLOCK_SIZE;
 
 	mmap_unset(frame);
-	pmm_used_blocks--;;
+	pmm_used_blocks--;
 }
+
+void* pmm_alloc_blocks(size_t size) {
+
+	if (pmm_get_free_block_count() <= size)
+		return 0;
+
+	int frame = mmap_first_free_s(size);
+
+	if (frame == -1)
+		return 0;
+
+	for (uint32_t i = 0;  i <size; i++)
+		mmap_set(frame + i);
+
+	uint32_t* addr = frame * PMM_BLOCK_SIZE;
+	pmm_used_blocks += size;
+
+	return (void*) addr;
+}
+
+void pmm_free_blocks(void* p, size_t size) {
+
+	uint32_t* addr = (uint32_t*)  p;
+	int frame = (uint32_t) addr / PMM_BLOCK_SIZE;
+
+	for (uint32_t i = 0; i < size; i++)
+		mmap_unset(frame + i);
+
+	pmm_used_blocks -= size;
+}
+
+
 
 uint32_t pmm_get_mem_size()
 {

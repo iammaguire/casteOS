@@ -59,7 +59,7 @@ void ata_print_info(ata_device_t *device)
 	printf("\t\tDMA: %s, ", itoa_nbuf(device->dma, 10));
 	printf("LBA: %s\n", itoa_nbuf(device->lba, 10));
 	
-	printf("\t\tCapacity: %s", itoa_nbuf(device->capacity, 10));
+	printf("\t\tCapacity: %s\n", itoa_nbuf(device->capacity, 10));
 }
 
 unsigned char ata_poll_drive_info(unsigned short drive, unsigned char arg, ata_device_t *device)
@@ -99,18 +99,18 @@ unsigned char ata_poll_drive_info(unsigned short drive, unsigned char arg, ata_d
 	device->is_slave = arg == 0xB0;
 	
 	device->lba = (buffer[49] >> 9) & 1;  
-    device->dma = (buffer[49] >> 8) & 1;
-    
-    device->cylinders = (uint16_t) buffer[1];  
-    device->heads = (uint16_t) buffer[3];  
-    device->sectors = (uint16_t) buffer[6];  
-  
-    if (device->lba) {  
-        device->capacity = (uint16_t) buffer[60];  
-    	if(device->capacity == 0) goto other_capacity;
-    } else {  
-    	other_capacity: device->capacity = device->heads * device->sectors * device->cylinders;  
-    }
+	device->dma = (buffer[49] >> 8) & 1;
+	    
+	device->cylinders = (uint16_t) buffer[1];  
+	device->heads = (uint16_t) buffer[3];  
+	device->sectors = (uint16_t) buffer[6];  
+	  
+	if (device->lba) {  
+		device->capacity = (uint16_t) buffer[60];  
+		if(device->capacity == 0) goto other_capacity;
+	} else {  
+		other_capacity: device->capacity = device->heads * device->sectors * device->cylinders;  
+	}
 
 	return 1;
 }

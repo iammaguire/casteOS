@@ -1,4 +1,5 @@
 #include <stdint.h>
+#include <stddef.h>
 
 #define PMM_BLOCKS_PER_BYTE 8
 #define PMM_BLOCK_SIZE 4096
@@ -40,4 +41,42 @@ inline void mmap_unset(int bit)
 inline char mmap_test(int bit)
 {
 	return pmm_mem_map[bit / 32] & (1 << (bit % 32));
+}
+
+inline int mmap_first_free_s (size_t size) 
+{
+
+	if (size == 0)
+		return -1;
+
+	if (size == 1)
+		return mmap_first_free();
+
+	for (uint32_t i = 0; i < pmm_get_block_count() / 32; i++)
+		if (pmm_mem_map[i] != 0xffffffff)
+		{
+			for (int j = 0; j < 32; j++) 
+			{
+				int bit = 1 << j;
+
+				if (!(pmm_mem_map[i] & bit) ) 
+				{
+					int starting_bit = i * 32;
+					starting_bit += bit;
+
+					uint32_t is_free = 0;
+
+					for (uint32_t count = 0; count <= size; count++) {
+
+						if (!mmap_test(starting_bit + count) )
+							is_free++;	// this bit is clear (free frame)
+
+						if (is_free == size)
+							return i * 4 * 8 + j; //free count==size needed; return index
+					}
+				}
+			}
+		}
+
+	return -1;
 }

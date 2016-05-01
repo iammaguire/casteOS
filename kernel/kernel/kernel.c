@@ -14,9 +14,15 @@ struct multiboot* multiboot_info;
 extern uint32_t kernstart;
 extern uint32_t kernend;
 
+uint32_t kernel_start = &kernstart;
+uint32_t kernel_end = &kernend;
+
 void kernel_early(struct multiboot* mbd, unsigned int magic)
 {
 	multiboot_info = mbd;
+
+	//kernel_end = &kernend;
+	//kernel_start = &kernstart;
 
 	terminal_initialize();
 
@@ -46,18 +52,38 @@ void kernel_early(struct multiboot* mbd, unsigned int magic)
 		abort();
 	}
 
-	printf("Kernel start: 0x%s\n", itoa_nbuf(&kernstart, 16));
-	printf("Kernel end: 0x%s\n", itoa_nbuf(&kernend, 16));
-	printf("Kernel size: %s\n", itoa_nbuf((&kernend - &kernstart) / 1024, 10));
+	uint32_t kernel_size = kernel_end - kernel_start;
+	uint32_t mem_size = mbd->mem_upper + mbd->mem_lower + 1024; // in KB
 
-	uint32_t kernel_size = &kernend - &kernstart;
-	uint32_t mem_size = mbd->mem_upper; // in KB
+	printf("Kernel start: 0x%s\n", itoa_nbuf(kernel_start, 16));
+	printf("Kernel end: 0x%s\n", itoa_nbuf(kernel_end, 16));
+	printf("Kernel size: 0x%s\n", itoa_nbuf(kernel_size, 16));
+
 	printf("Installing pmm...\n");
-	pmm_install(mbd, mem_size, &kernend);
-	
-	abort();
+	pmm_install(mbd, kernel_size, kernel_start, mem_size, kernel_end);
 
-	printf("Installing keyboard driver...\n");
+	printf("PMM regions initialized: %s\n", itoa_nbuf(pmm_get_block_count(), 10));
+	printf("PMM allocation blocks; used or reserved: %s\n", itoa_nbuf(pmm_get_use_block_count(), 10));
+	printf("PMM free blocks: %s\n", itoa_nbuf(pmm_get_free_block_count(), 10));
+	
+	printf("\nPerforming PMM test:\n");
+
+	uint32_t* p1 = (uint32_t*) pmm_alloc_block();
+	printf("\tp1 allocated at 0x%s\n", itoa_nbuf(p1, 16));
+
+	uint32_t* p2 = (uint32_t*) pmm_alloc_blocks(2);
+	printf("\tp2 allocated at 0x%s with two blocks\n", itoa_nbuf(p2, 16));
+
+	uint32_t* p3 = (uint32_t*) pmm_alloc_block();
+	printf("\tp3 allocated at 0x%s\n", itoa_nbuf(p3, 16));
+
+	pmm_free_block(p1);
+	pmm_free_blocks(p2, 2);
+	pmm_free_block(p3);
+
+	printf("Freed p1, p2, p3 successfully\n");
+
+	printf("\nInstalling keyboard driver...\n");
 	keyboard_install();
 	printf("Installing timer driver...\n");
 	timer_install();
@@ -105,9 +131,9 @@ void break_everything_completely(bool burn_it_all)
 
 	uint32_t* kernel_code = &kernstart;
  	
- 	for(int i = 0; i < (&kernend - &kernstart); i++)
+ 	for(int i = 0; i < (kernel_start - kernel_end); i++)
  	{
- 		kernel_code[i] = burn_it_all ? 0xDEADBEEF : 0x31C0;
+ 		kernel_code[i] = burn_it_all ? 0xDEADBEEF : 0xE920E81000;
  	}
 
  	printf("I could literally say anything and do anything because I will never ever be executed.");
