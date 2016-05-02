@@ -11,12 +11,52 @@ void graphics_install(struct multiboot* mbd)
 	screen_width = info->Xres;
 	screen_height = info->Yres;
 
-	fill_rect(0, 0, screen_width, 10, 0xFFFFFF);
-	fill_rect(0, screen_height - 10, screen_width, 10, 0xFFFFFF);
-	fill_rect(0, 0, 10, screen_height, 0xFFFFFF);
-	fill_rect(screen_width - 10, 0, 10, screen_height, 0xFFFFFF);
+	fill_rect(0, 0, screen_width, 12, 0xFFFFFF);
+	fill_rect(0, screen_height - 12, screen_width, 12, 0xFFFFFF);
+	fill_rect(0, 0, 12, screen_height, 0xFFFFFF);
+	fill_rect(screen_width - 12, 0, 12, screen_height, 0xFFFFFF);
 
 	draw_string("casteOS - by Connor Perkins", 11, 1, 0x000000, 0xFFFFFF);
+
+	int x = 12;
+	int y = 12;
+
+	for(int i = 0; i < 256; i++)
+	{
+		draw_char(i, x, y, 0xFFFFFF, 0x000000);
+
+		if(x < screen_width - 20)
+		{
+			x += 8;
+		} else {
+			x = 20;
+			y += 12;
+		}
+	}
+
+	for(uint32_t r = 0; r <= 0xFF; r++)
+	{
+		for(int g = 0; g <= 0xFF; g++)
+		{
+			put_pixel(12 + r, 36 + g, (uint32_t) (r << 16) | (g << 8));
+		}
+	}
+
+	for(uint32_t r = 0; r <= 0xFF; r++)
+	{
+		for(int b = 0; b <= 0xFF; b++)
+		{
+			put_pixel(12 + r + 0xFF, 36 + b, (uint32_t) (r << 16) | b);
+		}
+	}
+
+	for(uint32_t g = 0; g <= 0xFF; g++)
+	{
+		for(int b = 0; b <= 0xFF; b++)
+		{
+			put_pixel(12 + g + 0xFF * 2, 36 + b, (uint32_t) (g << 8) | b);
+		}
+	}
 }
 
 void update_graphics()
@@ -55,11 +95,11 @@ void draw_char(uint8_t c, uint16_t x, uint16_t y, uint32_t foreground, uint32_t 
 	uint16_t cx, cy;
 	uint16_t mask[8] = { 1, 2, 4, 8, 16, 32, 64, 128 };
 
-	for(cy = 0; cy < 8; cy++)
+	for(cy = 0; cy < 12; cy++)
 	{
 		for(cx = 0; cx < 8; cx++)
 		{
-			put_pixel(x + cx, y + cy, font8x8_basic[c][cy] & mask[cx] ? foreground : background);
+			put_pixel(x + cx, y + cy, font_8x12[c][cy] & mask[cx] ? foreground : background);
 		}
 	}
 }

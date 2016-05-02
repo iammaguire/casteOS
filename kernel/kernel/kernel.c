@@ -65,7 +65,7 @@ void kernel_early(struct multiboot* mbd, unsigned int magic)
 	printf("PMM regions initialized: %s\n", itoa_nbuf(pmm_get_block_count(), 10));
 	printf("PMM allocation blocks; used or reserved: %s\n", itoa_nbuf(pmm_get_use_block_count(), 10));
 	printf("PMM free blocks: %s\n", itoa_nbuf(pmm_get_free_block_count(), 10));
-	
+
 	printf("\nPerforming PMM test:\n");
 
 	uint32_t* p1 = (uint32_t*) pmm_alloc_block();
@@ -93,14 +93,14 @@ void kernel_early(struct multiboot* mbd, unsigned int magic)
 	printf("Initializing stdio...\n");
 	init_stdio();
 
-	/*if(mbd->flags & (1 << 11)) 
-	{
+	//if(mbd->flags & (1 << 11)) 
+	//{
 		graphics_install(mbd);
 		put_pixel(10, 100, 0x406001);
 		put_pixel(10, 110, 0xFFFF00);
-	} 
-	else 
-	{*/
+	//} 
+	//else 
+	//{
 		//printf("\n");
 		//floppy_install();
 		printf("\nInstalling ATA driver...\n");
@@ -110,7 +110,7 @@ void kernel_early(struct multiboot* mbd, unsigned int magic)
 
 		printf("\nFinished initialization successfully, starting CLI...\n\n");
 
-		init_shell();
+	//	init_shell();
 	//}
 }
 
