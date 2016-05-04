@@ -5,9 +5,9 @@
 #include <stdlib.h>
 #include <stdbool.h>
 
-#include <kernel/tty.h>
-#include <kernel/vga.h>
-#include <kernel/multiboot.h>
+#include "kernel/tty.h"
+#include "kernel/vga.h"
+#include "kernel/multiboot.h"
 
 struct multiboot* multiboot_info;
 
@@ -85,6 +85,8 @@ void kernel_early(struct multiboot* mbd, unsigned int magic)
 
 	printf("\nInstalling keyboard driver...\n");
 	keyboard_install();
+	printf("\nInstalling PS/2 mouse driver...\n");
+	mouse_install();
 	printf("Installing timer driver...\n");
 	timer_install();
 
@@ -96,8 +98,6 @@ void kernel_early(struct multiboot* mbd, unsigned int magic)
 	//if(mbd->flags & (1 << 11)) 
 	//{
 		graphics_install(mbd);
-		put_pixel(10, 100, 0x406001);
-		put_pixel(10, 110, 0xFFFF00);
 	//} 
 	//else 
 	//{
@@ -121,7 +121,14 @@ void kernel_main(void)
 	terminal_setcolor(make_color(COLOR_LIGHT_GREY, COLOR_BLACK));
 
 	for(;;)
-		shell();
+	{
+		update_graphics();
+		update_graphics();
+		update_graphics();
+		update_graphics();//shell();
+		//timer_wait(10);
+	}
+	
 	for(;;);
 }
 
