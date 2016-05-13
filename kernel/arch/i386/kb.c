@@ -97,9 +97,17 @@ void keyboard_handler(registers_t *regs)
 		if(!(kb_flags & CTRL))
 		{
 			if(kb_flags & (CAPS_LOCK | LSHIFT | RSHIFT))
-				kb_buf[last++] = kbdusShift[scancode];
+			{
+				char last_k = kbdusShift[scancode];
+				update_kb(last_k);
+				kb_buf[last++] = last_k;
+			}
 			else
-				kb_buf[last++] = kbdus[scancode];
+			{
+				char last_k = kbdus[scancode];
+				update_kb(last_k);
+				kb_buf[last++] = last_k;
+			}
 
 			scan_key_hooks(kb_buf[last - 1]);
 			

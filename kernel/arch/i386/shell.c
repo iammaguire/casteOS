@@ -2,7 +2,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include "kernel/shell.h"
-//#include "kernel/floppy_driver.h"
 #include "kernel/hard_disk_driver.h"
 
 command_table_t commands[MAX_COMMANDS];

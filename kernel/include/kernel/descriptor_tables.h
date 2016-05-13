@@ -1,3 +1,6 @@
+#ifndef HEADER_DTABLES_H
+#define HEADER_DTABLES_H
+
 #include <stdint.h>
 
 struct gdt_entry_struct
@@ -19,6 +22,9 @@ struct gdt_ptr_struct
 typedef struct gdt_ptr_struct gdt_ptr_t;
 
 void init_descriptor_tables();
+
+extern uint32_t gdt_start;
+extern uint32_t gdt_end;
 
 struct idt_entry_struct
 {
@@ -86,3 +92,5 @@ extern void irq12();
 extern void irq13();
 extern void irq14();
 extern void irq15();
+
+#endif
