@@ -99,7 +99,7 @@ void update_graphics()
 	fill_rect(screen_width - 12, 0, 12, screen_height, 0xFFFFFF);
 
 	draw_string("casteOS - much grafics wow", 11, 0, 0x000000, 0xFFFFFF);
-	draw_string("The quick brown fox jumped over the lazy dog", 12, 324, 0x00FF00, 0x0);
+	draw_string("The quick brown fox jumps over the lazy dog", 12, 324, 0x00FF00, 0x0);
 	draw_string(last_pressed, screen_width - 11, 0, 0xFF0077, 0xFFFFFF);
 
 	int x = 12;
@@ -185,11 +185,6 @@ void fill_rect(uint16_t x, uint16_t y, uint16_t width, uint16_t height, uint32_t
 
 		where += bytes_per_line;
 	}
-}
-
-uint8_t scale_rgb(uint8_t val, int in_low, int in_high)
-{
-	return ((val -  in_low) / (in_high -  in_low)) * (255 - 0) + 0;
 }
 
 void draw_mouse(uint16_t x, uint16_t y)

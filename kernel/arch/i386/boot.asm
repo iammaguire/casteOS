@@ -1,11 +1,11 @@
 MBALIGN     equ  1<<0                   ; align loaded modules on page boundaries
 MEMINFO     equ  1<<1                   ; provide memory map
-GFXMODE    equ  1<<2
+GFXMODE    	equ  1<<2
 FLAGS       equ  MBALIGN | MEMINFO | GFXMODE      ; this is the Multiboot 'flag' field
 MAGIC       equ  0x1BADB002             ; 'magic number' lets bootloader find the header
 CHECKSUM    equ -(MAGIC + FLAGS)        ; checksum of above, to prove we are multiboot
 
-MODE_TYPE equ 0
+MODE_TYPE equ 1
 WIDTH equ 1920
 HEIGHT equ 1080
 DEPTH equ 32
@@ -29,7 +29,7 @@ align 4
 stack_bottom:
 times 16384 db 0
 stack_top:
- 
+
 section .text
 global _start
 

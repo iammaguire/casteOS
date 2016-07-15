@@ -2,6 +2,7 @@
 #include <stdarg.h>
 #include <stdio.h>
 #include <string.h>
+#include <stdint.h>
 
 static void print(const char* data, size_t data_length)
 {
@@ -66,4 +67,12 @@ int printf(const char* restrict format, ...)
 	va_end(parameters);
 
 	return written;
+}
+
+
+void printui64(uint64_t val, int radix)
+{
+	printf("radix: %s -- ", itoa_nbuf(radix, 10));
+	printf("%s", itoa_nbuf((uint32_t) (val >> 32) & 0xFFFFFFFF, radix));
+	printf("%s", itoa_nbuf((uint32_t) val & 0xFFFFFFFF, radix));
 }

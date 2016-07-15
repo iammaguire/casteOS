@@ -1,8 +1,8 @@
-char * itoa( int value, char * str, int base )
+char* itoa( int value, char* str, int base )
 {
-    char * rc;
-    char * ptr;
-    char * low;
+    char* rc;
+    char* ptr;
+    char* low;
 
     if ( base < 2 || base > 36 )
     {
@@ -24,7 +24,7 @@ char * itoa( int value, char * str, int base )
     } while ( value );
 
     *ptr-- = '\0';
- 
+
     while ( low < ptr )
     {
         char tmp = *low;
@@ -34,7 +34,7 @@ char * itoa( int value, char * str, int base )
     return rc;
 }
 
-char* buf = "";
+char* buf;
 
 char * itoa_nbuf( int value, int base )
 {
